@@ -1,0 +1,165 @@
+<html>
+<head>
+
+<title>Life Game</title>
+
+<style>
+    #canvas {
+        width: 100%;
+        height: 100%;
+        background-color: gray;
+        margin: 0;
+    }
+    .live {
+        background-color: green;
+        margin: 0;
+    }
+    .death {
+        background-color: gray;
+        margin: 0;
+    }
+    body {
+     margin: 0
+    }
+    
+</style>
+
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
+
+</head>
+
+<body>
+
+<table id="canvas" border=1>
+
+</table>
+
+
+<script>
+    rows = 60;
+    cols = 80;
+    
+    function init_grid()
+    {
+        var grid = new Array(rows);
+        for(i=0; i<rows; i++)
+        {
+            grid[i] = new Array(cols);
+        }
+        for(i=0; i<rows; i++)
+        {
+            for(j=0; j<cols; j++)
+            {
+                grid[i][j] = Math.round(Math.random());
+            }
+        }
+        
+        return grid;
+    }
+    
+    function init_canvas()
+    {
+        var table = $("#canvas")
+        for(i=0; i<rows; i++)
+        {
+            var tr = $("<tr></tr>");
+            tr.attr("id", "tr" + i);
+            for(j=0; j<cols; j++)
+            {
+                var td = $("<td><td>");
+                td.attr("id", "td" + i + "-" + j);
+                tr.append(td);
+            }
+            table.append(tr);
+        }
+    }
+    
+    grid = init_grid();
+    init_canvas();
+    
+    function draw_canvas()
+    {
+        for(i=0; i<rows; i++)
+        {
+            for(j=0; j<cols; j++)
+            {
+                var td = $("#td" + i + "-" + j);
+                if(grid[i][j])
+                {
+                    td.attr("class", "live");
+                }
+                else
+                {
+                    td.attr("class", "death");
+                }
+            }
+        }
+    }
+    
+    draw_canvas();
+    
+    function live_or_death(m, n)
+    {
+        dests = [[0,1],[0,-1],[1,0],[1,1],[1,-1],[-1,0],[-1,1],[-1,-1]];
+        
+        var count = 0;
+        
+        for (d in dests)
+        {
+            dest = dests[d];
+            var x = dest[0] + m;
+            var y = dest[1] + n;
+            
+            if (x>=0 && x<rows && y>=0 && y < cols)
+            {
+                
+                if(grid[x][y] & 0b1)
+                {
+                    count++;
+                }
+            }
+            
+        }
+        if (count >= 2 && count <= 3 && grid[m][n] &0b1 == 1)
+        {
+            grid[m][n] |= 0b10;
+        }
+        else if (count== 3 && grid[m][n] | 0 == 0)
+        {
+            grid[m][n] |= 0b10;
+        }
+    }
+    
+    function set_mid_status()
+    {   
+        for(i=0; i<rows; i++)
+        {
+            for(j=0; j<cols; j++)
+            {
+                live_or_death(i, j);
+            }
+        }
+    }
+    function flush()
+    {
+        set_mid_status();
+        for(i=0; i<rows; i++)
+        {
+            for(j=0; j<cols; j++)
+            {
+                grid[i][j] >>= 1;
+            }
+        }
+        draw_canvas();
+    }
+    
+    setInterval("flush()", 100);
+    
+    
+    
+
+
+</script>
+
+</body>
+</html>
